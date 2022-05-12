@@ -1,0 +1,22 @@
+{
+  "name": "erc20",
+  "version": "1.0.0",
+  "description": "my implementation of ERC20 standard",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "erc20"
+  },
+  "keywords": [
+    "solidity",
+    "erc20",
+    "eip20",
+    "blockchain",
+    "etherium"
+  ],
+  "author": "Mad Aekauq",
+  "license": "ISC"
+}
