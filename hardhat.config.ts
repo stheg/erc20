@@ -1,9 +1,14 @@
-const { task } = require("hardhat/config");
+import { task } from "hardhat/config";
+import de from "dotenv";
 
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-etherscan");
-require("solidity-coverage");
-require("dotenv").config();
+import '@typechain/hardhat';
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
+import "solidity-coverage";
+import "tsconfig-paths/register";
+
+
+de.config();
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -13,10 +18,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-module.exports = {
+export default {
   solidity: {
     version: "0.8.13",
     settings: { optimizer: { enabled: true } }
