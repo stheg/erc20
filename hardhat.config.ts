@@ -7,7 +7,6 @@ import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "tsconfig-paths/register";
 
-
 de.config();
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
