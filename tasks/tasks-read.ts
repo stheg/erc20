@@ -1,6 +1,26 @@
 import { task } from "hardhat/config";
 import { MAERC20 } from "../typechain-types";
 
+task("balance", "Transfers the amount of tokens to the specified address")
+    .addParam("contract", "Address of the contract")
+    .addOptionalParam("addr", "Address of an account")
+    .setAction(async (args, hre): Promise<number> => {
+        let addr: string;
+
+        const accounts = await hre.ethers.getSigners();
+        if (!args.to) {
+            console.log("default account #2 is used");
+            addr = await accounts[0].getAddress();
+        } else {
+            addr = args.to;
+        }
+        const contract: MAERC20 = await hre.run("init-contract", { address: args.contract, signer: addr })
+        const balance = await contract.balanceOf(addr);
+        console.log(balance.toNumber());
+        
+        return balance.toNumber();
+    });
+
 task("allowance", "Returns amount which can be transferred from the specified address by the specified spender")
     .addParam("contract", "Address of the contract")
     .addOptionalParam("from", "Address of owner")
@@ -23,11 +43,11 @@ task("allowance", "Returns amount which can be transferred from the specified ad
             spender = args.spender;
         }
         const contract: MAERC20 = await hre.run(
-            "init-contract", 
+            "init-contract",
             { address: args.contract, signer: spender }
         );
         const approvedAmount = await contract.allowance(owner, spender);
         console.log(approvedAmount.toNumber());
-        
+
         return approvedAmount.toNumber();
     });
