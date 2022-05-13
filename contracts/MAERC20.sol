@@ -21,19 +21,18 @@ contract MAERC20 {
     //from => spender => value
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    constructor(
-        string memory tokenName, 
-        string memory tokenSymbol
-    ) {
+    constructor(string memory tokenName, string memory tokenSymbol) {
         name = tokenName;
         symbol = tokenSymbol;
     }
 
+    /// @notice Checks if enough tokens exist on the balance
     modifier checkBalance(address addr, uint256 value) {
         require(balanceOf[addr] >= value, "No enough tokens");
         _;
     }
 
+    /// @notice Checks if the specified address isn't the Zero-Address
     modifier verifyAddress(address addr) {
         require(addr != address(0), "The zero-address is not allowed");
         _;
@@ -78,7 +77,6 @@ contract MAERC20 {
                 _allowances[from][msg.sender] >= value, 
                 "No enough approved amount"
             );
-
             _allowances[from][msg.sender] -= value;
         }
 
@@ -105,9 +103,8 @@ contract MAERC20 {
     /// @notice Mints some amount of tokens according to `msg.value`
     /// and adds it to the sender's balance, increasing the total supply
     function mint() public payable {
-        uint tokenAmount = msg.value;
-        balanceOf[msg.sender] += tokenAmount;
-        totalSupply += tokenAmount;
+        balanceOf[msg.sender] += msg.value;
+        totalSupply += msg.value;
     }
 
     /// @notice Burns tokens from the sender's balance, 
@@ -115,15 +112,13 @@ contract MAERC20 {
     /// and transfers Ethers back to the sender
     /// @param value amount of tokens to burn
     function burn(uint value) public checkBalance(msg.sender, value) {
-        uint etherValue = value;
         balanceOf[msg.sender] -= value;
         totalSupply -= value;
-
-        payable(msg.sender).transfer(etherValue);
+        payable(msg.sender).transfer(value);
     }
 
-    /// @dev Makes sure that the balance of `from` is enough 
-    /// to send `value` tokens, changes balances and emits the `Transfer` event,
+    /// @dev Makes sure that the balance of `from` is enough to send
+    /// `value` tokens, changes balances and emits the `Transfer` event,
     /// otherwise it throws an error 
     function _transferOrThrow(address from, address to, uint256 value)
         private

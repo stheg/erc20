@@ -36,5 +36,11 @@ Common tasks:
   verify        Verifies contract on Etherscan
 
 Interaction with the contract:
-
+  allowance     Returns amount which the spender can spend from someone balance
+  approve       Sets the amount which the spender can transfer from someone balance
+  balance       Transfers the amount of tokens to the specified address
+  burn          Burns tokens and refunds ether
+  mint          Changes ether to tokens
+  transfer      Transfers the amount of tokens to the specified address
+  transfer-from The spender transfers from the approved from-address to the to-address
 ```

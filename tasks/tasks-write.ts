@@ -30,7 +30,7 @@ task("transfer", "Transfers the amount of tokens to the specified address")
     await contract.transfer(toAddr, args.value, {});
 });
 
-task("transfer-from", "The specified spender transfers from the specified from-address to the specified to-address")
+task("transfer-from", "The spender transfers from the approved from-address to the to-address")
     .addParam("contract", "Address of the contract")
     .addParam("value", "The amount which is allowed to transfer")
     .addOptionalParam("from", "Address of from")
@@ -67,7 +67,7 @@ task("transfer-from", "The specified spender transfers from the specified from-a
         await contract.transferFrom(from, to, args.value);
     })
 
-task("approve", "Sets the amount which can be transferred from the specified address by the specified spender")
+task("approve", "Sets the amount which the spender can transfer from someone balance")
     .addParam("contract", "Address of the contract")
     .addParam("value", "The amount which is allowed to transfer")
     .addOptionalParam("from", "Address of owner")

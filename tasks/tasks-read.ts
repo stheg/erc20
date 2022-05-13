@@ -21,7 +21,7 @@ task("balance", "Transfers the amount of tokens to the specified address")
         return balance.toNumber();
     });
 
-task("allowance", "Returns amount which can be transferred from the specified address by the specified spender")
+task("allowance", "Returns amount which the spender can spend from someone balance")
     .addParam("contract", "Address of the contract")
     .addOptionalParam("from", "Address of owner")
     .addOptionalParam("spender", "Address of spender")
