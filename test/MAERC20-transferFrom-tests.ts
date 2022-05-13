@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
+import testDeployment from "./test-deployment";
 
 describe("MAERC20.transferFrom", function () {
     let accounts: Signer[];
@@ -12,18 +13,11 @@ describe("MAERC20.transferFrom", function () {
     const tokenName = "My Test Token";
     const tokenSymbol = "MTT";
     const initialSupply = 1000;
-    
-    const startBalance = 1000;
 
     beforeEach(async function () {
-        accounts = await ethers.getSigners();
-        owner = accounts[0];
-
-        const contractFactory =
-            await ethers.getContractFactory("MAERC20", owner);
-        contract = await contractFactory.deploy(tokenName, tokenSymbol, initialSupply);
+        [accounts, owner, contract] =
+            await testDeployment(tokenName, tokenSymbol, initialSupply);
         ownerAddr = await owner.getAddress();
-        await contract.mint({ value: startBalance });
     });
 
     it("should revert if sender isn't approved", async () => {
@@ -90,7 +84,7 @@ describe("MAERC20.transferFrom", function () {
         const ownerBalanceAfter = await contract.balanceOf(ownerAddr);
         const spenderBalanceAfter = await contract.balanceOf(spenderAddr);
         const stillAllowed = await contract.allowance(ownerAddr, spenderAddr);
-        expect(ownerBalanceAfter).eq(startBalance - amount);
+        expect(ownerBalanceAfter).eq(initialSupply - amount);
         expect(spenderBalanceAfter).eq(amount);
         expect(stillAllowed).eq(allowed - amount);
     });

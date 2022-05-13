@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
+import testDeployment from "./test-deployment";
 
 describe("MAERC20", function () {
     let accounts: Signer[];
@@ -13,13 +14,8 @@ describe("MAERC20", function () {
     const initialSupply = 1000; 
 
     beforeEach(async function () {
-        accounts = await ethers.getSigners();
-        owner = accounts[0];
-
-        const contractFactory =
-            await ethers.getContractFactory("MAERC20", owner);
-        contract = await contractFactory.deploy(tokenName, tokenSymbol, initialSupply);
-        await contract.deployed();
+        [accounts, owner, contract] = 
+            await testDeployment(tokenName, tokenSymbol, initialSupply, false);
     });
 
     it("should return name of the token", async function () {
@@ -39,7 +35,7 @@ describe("MAERC20", function () {
 
     it("should return initial supply", async function () {
         const totalSupply = await contract.totalSupply();
-        expect(totalSupply).eq(initialSupply);
+        expect(totalSupply).eq(0);
     });
 
     it("should return default balance", async function () {

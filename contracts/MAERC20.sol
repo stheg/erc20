@@ -18,17 +18,15 @@ contract MAERC20 {
         uint256 value
     );
 
-    //owner => spender => value
+    //from => spender => value
     mapping(address => mapping(address => uint256)) private _allowances;
 
     constructor(
         string memory tokenName, 
-        string memory tokenSymbol, 
-        uint initialSupply
+        string memory tokenSymbol
     ) {
         name = tokenName;
         symbol = tokenSymbol;
-        totalSupply = initialSupply;
     }
 
     modifier checkBalance(address addr, uint256 value) {

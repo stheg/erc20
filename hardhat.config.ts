@@ -1,5 +1,6 @@
 import { task } from "hardhat/config";
 import de from "dotenv";
+de.config();
 
 import '@typechain/hardhat';
 import "@nomiclabs/hardhat-waffle";
@@ -7,7 +8,12 @@ import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "tsconfig-paths/register";
 
-de.config();
+import "./tasks/subtask-init-contract";
+import "./tasks/task-transfer";
+import "./tasks/task-transfer-from";
+import "./tasks/task-balance";
+import "./tasks/task-allowance";
+import "./tasks/task-approve";
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();

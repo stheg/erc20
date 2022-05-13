@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
+import testDeployment from "./test-deployment";
 
 describe("MAERC20 extra functions", function () {
     let accounts: Signer[];
@@ -10,16 +11,10 @@ describe("MAERC20 extra functions", function () {
 
     const tokenName = "My Test Token";
     const tokenSymbol = "MTT";
-    const initialSupply = 1000;
 
     beforeEach(async function () {
-        accounts = await ethers.getSigners();
-        owner = accounts[0];
-
-        const contractFactory =
-            await ethers.getContractFactory("MAERC20", owner);
-        contract = await contractFactory.deploy(tokenName, tokenSymbol, initialSupply);
-        await contract.deployed();
+        [accounts, owner, contract] =
+            await testDeployment(tokenName, tokenSymbol, 0, false);
     });
 
     it("mint should generate tokens", async function () {
@@ -34,7 +29,7 @@ describe("MAERC20 extra functions", function () {
             [-amount, amount]
         );
         expect(balanceAfter).eq(amount);
-        expect(totalSupply).eq(initialSupply + amount);
+        expect(totalSupply).eq(amount);
     });
 
     it("burn should destroy tokens & refund", async function () {
@@ -51,7 +46,7 @@ describe("MAERC20 extra functions", function () {
             [burnAmount, -burnAmount]
         );
         expect(balanceAfter).eq(mintAmount - burnAmount);
-        expect(totalSupply).eq(initialSupply + mintAmount - burnAmount);
+        expect(totalSupply).eq(mintAmount - burnAmount);
     });
 
     it("burn should revert if no enough tokens", async function () {
