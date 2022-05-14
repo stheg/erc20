@@ -5,15 +5,28 @@ My implementation of ERC20 token.
 Steps to start:
 - use 'npm install' in your console to install all dependencies
 - create your own .env file with your private keys (see .env.example)
-- check the hardhat.config.js to see the configuration and 
+- check the hardhat.config.ts to see the configuration and 
 how your private keys are used there
 
 - local deployment:
 --- use 'npx hardhat node --network hardhat' in you console #1 to start your local blockchain node.
---- use 'npx hardhat run .\scripts\deploy.js --network localhost' in your console #2 to deploy the contract using test account
+--- use 'npx hardhat run .\scripts\deploy.ts --network localhost' in your console #2 to deploy the contract using test account
 
 - rinkeby test network deployment:
---- use 'npx hardhat run .\scripts\deploy.js --network rinkeby' in your console to deploy the contract to the rinkeby test network using your own test account
+--- use 'npx hardhat run .\scripts\deploy.ts --network rinkeby' in your console to deploy the contract to the rinkeby test network using your own test account
+
+!!! ATTENTION
+Project uses type-system generated for the contract by typechain.
+You can find generated files in a typechaing-types directory.
+In case the directory is absent (i.e. after npx hardhat clean) the compilation task won't work, and you should comment out the next lines for tasks in hardhat.config.ts:
+```
+import "./tasks/subtask-init-contract";
+import "./tasks/tasks-write";
+import "./tasks/tasks-read";
+```
+After the contract is compiled the typechain-directory must appear.
+Uncomment the lines with tasks back and use them to interact with a deployed contract
+!!!
 
 This project demonstrates a basic Hardhat use case.
 

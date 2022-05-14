@@ -1,4 +1,3 @@
-import { Signer } from "ethers";
 import { task } from "hardhat/config";
 import { MAERC20 } from "../typechain-types";
 
@@ -15,7 +14,7 @@ task("transfer", "Transfers the amount of tokens to the specified address")
         "init-contract", 
         {address: args.contract, signer:from}
     );
-    await contract.transfer(to, args.value, {});
+    await contract.transfer(to, args.value);
 });
 
 task("transfer-from", "The spender transfers from the approved from-address to the to-address")
@@ -60,7 +59,7 @@ task("mint", "Changes ether to tokens")
     .setAction(async (args, hre) => {
         const accounts = await hre.ethers.getSigners();
         let from = args.from ?? accounts[0].address;
-        let to = args.to ?? accounts[1].address;
+        let to = args.to ?? from;
         const contract: MAERC20 = await hre.run(
             "init-contract",
             { address: args.contract, signer: from }
