@@ -1,13 +1,14 @@
 import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { MAERC20 } from "../typechain-types";
 import testDeployment from "./test-deployment";
+import { MAERC20 } from "../typechain-types";
+
 
 describe("MAERC20.transfer", function () {
-    let accounts: Signer[];
-    let owner: Signer;
-    let ownerAddr: string;
+    let accounts: SignerWithAddress[];
+    let owner: SignerWithAddress;
+    let recipient: SignerWithAddress;
     let contract: MAERC20;
 
     const tokenName = "My Test Token";
@@ -17,42 +18,40 @@ describe("MAERC20.transfer", function () {
     beforeEach(async function () {
         [accounts, owner, contract] =
             await testDeployment(tokenName, tokenSymbol, initialSupply);
-        ownerAddr = await owner.getAddress();
+        recipient = accounts[1];
     });
 
     it("should revert if the zero-address is used", async () => {
-        let amount = 10;
-        const t = contract.transfer(ethers.constants.AddressZero, amount);
+        const t = contract.transfer(ethers.constants.AddressZero, 10);
         await expect(t).to.be.revertedWith("The zero-address is not allowed");
     });
 
-    it("should revert if no enough tokens", async function () {
-        const recipientAddr = await accounts[1].getAddress();
-        const amount = 1001;
-        const t = contract.transfer(recipientAddr, amount);
+    it("should revert if no enough tokens", async () => {
+        const moreThanExists = initialSupply + 10;
+        const t = contract.transfer(recipient.address, moreThanExists);
         await expect(t).to.be.revertedWith("No enough tokens");
     });
 
-    it("should emit transfer event", async function () {
-        const recipientAddr = await accounts[1].getAddress();
+    it("should emit transfer event", async () => {
         let amount = 0;
-        let t = contract.transfer(recipientAddr, amount);
+        let t = contract.transfer(recipient.address, amount);
         await expect(t).to.emit(contract, "Transfer")
-            .withArgs(ownerAddr, recipientAddr, amount);
+            .withArgs(owner.address, recipient.address, amount);
         
         amount = 10;
-        t = contract.transfer(recipientAddr, amount);
+        t = contract.transfer(recipient.address, amount);
         await expect(t).to.emit(contract, "Transfer")
-            .withArgs(ownerAddr, recipientAddr, amount);
+            .withArgs(owner.address, recipient.address, amount);
     });
 
-    it("should change balances", async function () {
-        const recipientAddr = await accounts[1].getAddress();
+    it("should change balances", async () => {
         const amount = 10;
-        await contract.transfer(recipientAddr, amount);
+        await contract.transfer(recipient.address, amount);
 
-        const ownerBalanceAfter = await contract.balanceOf(ownerAddr);
-        const recipientBalanceAfter = await contract.balanceOf(recipientAddr);
+        const ownerBalanceAfter = await contract.balanceOf(owner.address);
+        const recipientBalanceAfter =
+            await contract.balanceOf(recipient.address);
+
         expect(ownerBalanceAfter).eq(initialSupply - amount);
         expect(recipientBalanceAfter).eq(amount);
     });

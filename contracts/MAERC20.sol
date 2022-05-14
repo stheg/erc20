@@ -12,6 +12,7 @@ contract MAERC20 {
     mapping(address => uint256) public balanceOf;
     //from => spender => value
     mapping(address => mapping(address => uint256)) private _allowances;
+    address _contractOwner;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(
@@ -23,6 +24,12 @@ contract MAERC20 {
     constructor(string memory tokenName, string memory tokenSymbol) {
         name = tokenName;
         symbol = tokenSymbol;
+        _contractOwner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == _contractOwner, "Only the owner can do this.");
+        _;
     }
 
     /// @notice Checks if enough tokens exist on the balance
@@ -99,21 +106,25 @@ contract MAERC20 {
         return true;
     }
 
-    /// @notice Mints some amount of tokens according to `msg.value`
-    /// and adds it to the sender's balance, increasing the total supply
-    function mint() public payable {
-        balanceOf[msg.sender] += msg.value;
-        totalSupply += msg.value;
+    /// @notice Adds the requested amount of tokens to the requested balance,
+    /// increases the total supply and emits an `Transfer` event
+    function mint(address to, uint value) public onlyOwner() {
+        balanceOf[to] += value;
+        totalSupply += value;
+        emit Transfer(address(0), to, value);
     }
 
-    /// @notice Burns tokens from the sender's balance, 
-    /// decreasing the total supply of the token,
-    /// and transfers Ethers back to the sender
+    /// @notice Burns tokens from the balance 
+    /// and decreases the total supply of the token
     /// @param value amount of tokens to burn
-    function burn(uint value) public checkBalance(msg.sender, value) {
+    function burn(uint value) 
+        public 
+        onlyOwner() 
+        checkBalance(msg.sender, value) 
+    {
         balanceOf[msg.sender] -= value;
         totalSupply -= value;
-        payable(msg.sender).transfer(value);
+        emit Transfer(msg.sender, address(0), value);
     }
 
     /// @dev Makes sure that the balance of `from` is enough to send

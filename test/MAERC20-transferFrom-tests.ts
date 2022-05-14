@@ -1,13 +1,14 @@
 import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
 import testDeployment from "./test-deployment";
 
 describe("MAERC20.transferFrom", function () {
-    let accounts: Signer[];
-    let owner: Signer;
-    let ownerAddr: string;
+    let accounts: SignerWithAddress[];
+    let owner: SignerWithAddress;
+    let spender: SignerWithAddress;
+    let recipient: SignerWithAddress;
     let contract: MAERC20;
 
     const tokenName = "My Test Token";
@@ -17,75 +18,74 @@ describe("MAERC20.transferFrom", function () {
     beforeEach(async function () {
         [accounts, owner, contract] =
             await testDeployment(tokenName, tokenSymbol, initialSupply);
-        ownerAddr = await owner.getAddress();
+        spender = accounts[1];
+        recipient = accounts[2];
     });
 
     it("should revert if sender isn't approved", async () => {
-        const notAllowedAddr = await accounts[1].getAddress();
-        const amount = 10;
-        const t = contract.transferFrom(notAllowedAddr, ownerAddr, amount);
+        const notApprovedSpender = spender;
+        const t = contract.transferFrom(
+            notApprovedSpender.address, 
+            owner.address, 
+            10
+        );
         await expect(t).to.be.revertedWith("No enough approved amount");
     });
 
     it("should work as transfer if a sender == 'from'", async () => {
-        const anotherAddr = await accounts[1].getAddress();
         const amount = 10;
-        const t = contract.transferFrom(ownerAddr, anotherAddr, amount);
+        const t = 
+            contract.transferFrom(owner.address, recipient.address, amount);
         await expect(t).to.emit(contract, "Transfer")
-            .withArgs(ownerAddr, anotherAddr, amount);
+            .withArgs(owner.address, recipient.address, amount);
     });
 
     it("should revert if no enough tokens", async () => {
-        const spender = accounts[1];
-        const spenderAddr = await spender.getAddress(); 
-        const amount = 1001;
-        await contract.approve(spenderAddr, 2 * amount);
+        const moreThanOnBalance = initialSupply + 10;
+        await contract.approve(spender.address, 2*moreThanOnBalance);
         const t = contract.connect(spender)
-            .transferFrom(ownerAddr, spenderAddr, amount);
+            .transferFrom(owner.address, spender.address, moreThanOnBalance);
         await expect(t).to.be.revertedWith("No enough tokens");
     });
 
     it("should revert if value exceeds the approved one", async () => {
-        const spender = accounts[1];
-        const spenderAddr = await spender.getAddress(); 
-        const amount = 100;
-        await contract.approve(spenderAddr, amount / 10);
+        const approvedAmount = 10;
+        const moreThanApproved = approvedAmount * 10;
+        await contract.approve(spender.address, approvedAmount);
         const t = contract.connect(spender)
-            .transferFrom(ownerAddr, spenderAddr, amount);
+            .transferFrom(owner.address, spender.address, moreThanApproved);
         await expect(t).to.be.revertedWith("No enough approved amount");
     });
 
     it("should emit transfer event", async () => {
-        const spender = accounts[1];
-        const spenderAddr = await spender.getAddress(); 
         let amount = 10;
-        await contract.approve(spenderAddr, amount);
+        await contract.approve(spender.address, amount);
         let t = contract.connect(spender)
-            .transferFrom(ownerAddr, spenderAddr, amount);
+            .transferFrom(owner.address, spender.address, amount);
         await expect(t).to.emit(contract, "Transfer")
-            .withArgs(ownerAddr, spenderAddr, amount);
+            .withArgs(owner.address, spender.address, amount);
 
         amount = 0;
         t = contract.connect(spender)
-            .transferFrom(ownerAddr, spenderAddr, amount);
+            .transferFrom(owner.address, spender.address, amount);
         await expect(t).to.emit(contract, "Transfer")
-            .withArgs(ownerAddr, spenderAddr, amount);
+            .withArgs(owner.address, spender.address, amount);
     });
 
     it("should change balances & allowance", async () => {
-        const spender = accounts[1];
-        const spenderAddr = await spender.getAddress();
         const amount = 10;
-        const allowed = amount * 2;
-        await contract.approve(spenderAddr, allowed);
+        const approvedAmount = amount * 2;
+        await contract.approve(spender.address, approvedAmount);
         await contract.connect(spender)
-            .transferFrom(ownerAddr, spenderAddr, amount);
+            .transferFrom(owner.address, spender.address, amount);
 
-        const ownerBalanceAfter = await contract.balanceOf(ownerAddr);
-        const spenderBalanceAfter = await contract.balanceOf(spenderAddr);
-        const stillAllowed = await contract.allowance(ownerAddr, spenderAddr);
+        const ownerBalanceAfter = await contract.balanceOf(owner.address);
+        const spenderBalanceAfter = await contract.balanceOf(spender.address);
+        const stillAllowed = 
+            await contract.allowance(owner.address, spender.address);
+        
         expect(ownerBalanceAfter).eq(initialSupply - amount);
         expect(spenderBalanceAfter).eq(amount);
-        expect(stillAllowed).eq(allowed - amount);
+        expect(stillAllowed).eq(approvedAmount - amount);
     });
 });

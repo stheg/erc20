@@ -1,12 +1,12 @@
 import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
 import testDeployment from "./test-deployment";
 
 describe("MAERC20.approve", function () {
-    let accounts: Signer[];
-    let owner: Signer;
+    let accounts: SignerWithAddress[];
+    let owner: SignerWithAddress;
     let contract: MAERC20;
 
     const tokenName = "My Test Token";
@@ -19,32 +19,31 @@ describe("MAERC20.approve", function () {
     });
 
     it("should revert if the zero-address is used", async () => {
-        let amount = 10;
-        const t = contract.approve(ethers.constants.AddressZero, amount);
+        const t = contract.approve(ethers.constants.AddressZero, 10);
         await expect(t).to.be.revertedWith("The zero-address is not allowed");
     });
 
     it("should emit Approval event", async () => {
-        const ownerAddr = await owner.getAddress();
-        const spenderAddr = await accounts[1].getAddress();
+        const spender = accounts[1];
         let amount = 10;
-        const t = contract.approve(spenderAddr, amount);
+        const t = contract.approve(spender.address, amount);
         await expect(t).to.emit(contract, "Approval")
-            .withArgs(ownerAddr, spenderAddr, amount);
+            .withArgs(owner.address, spender.address, amount);
     });
 
     it("should set allowance instead of the previous value", async () => {
-        const ownerAddr = await owner.getAddress();
-        const spenderAddr = await accounts[1].getAddress();
-        let amount = 10;
-        await contract.approve(spenderAddr, amount);
-        const firstApproval = await contract.allowance(ownerAddr, spenderAddr);
-        expect(firstApproval).eq(amount);
+        const spender = accounts[1];
+        let approvedAmount = 10;
+        await contract.approve(spender.address, approvedAmount);
+        const firstAllowedAmount = 
+            await contract.allowance(owner.address, spender.address);
+        expect(firstAllowedAmount).eq(approvedAmount);
 
-        amount = 13;
-        await contract.approve(spenderAddr, amount);
-        const secondApproval = await contract.allowance(ownerAddr, spenderAddr);
-        console.log(Number(firstApproval) + amount);
-        expect(secondApproval).not.eq(Number(firstApproval) + amount);
+        approvedAmount = 13;
+        await contract.approve(spender.address, approvedAmount);
+        const secondAllowedAmount = 
+            await contract.allowance(owner.address, spender.address);
+        expect(secondAllowedAmount)
+            .not.eq(firstAllowedAmount.add(approvedAmount));
     });
 });

@@ -19,7 +19,7 @@ async function testDeployment(
     await contract.deployed();
 
     if (doMint)
-        await contract.mint({value: initialSupply});
+        await contract.mint(owner.address, initialSupply);
 
     return [accounts, owner, contract];
 }

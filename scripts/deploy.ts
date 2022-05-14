@@ -6,12 +6,9 @@ async function main() {
         "MAERC20",
         owner
     );
-    const contract = await contractFactory.deploy('MADT', 'MADT');
+    const contract = await contractFactory.deploy('MADTv2', 'MADT2');
     await contract.deployed();
     console.log("Contract deployed to:", contract.address);
-
-    await contract.mint({value: 1000});
-    console.log("Owner has minted 1000 tokens");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

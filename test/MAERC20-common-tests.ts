@@ -1,12 +1,11 @@
-import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { MAERC20 } from "../typechain-types";
 import testDeployment from "./test-deployment";
 
 describe("MAERC20", function () {
-    let accounts: Signer[];
-    let owner: Signer;
+    let accounts: SignerWithAddress[];
+    let owner: SignerWithAddress;
     let contract: MAERC20;
 
     const tokenName = "My Test Token";
@@ -39,8 +38,7 @@ describe("MAERC20", function () {
     });
 
     it("should return default balance", async function () {
-        const ownerAddr = await owner.getAddress();
-        const balance = await contract.balanceOf(ownerAddr);
+        const balance = await contract.balanceOf(owner.address);
         expect(balance).eq(0);
     });
 });

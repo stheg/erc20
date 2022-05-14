@@ -9,7 +9,6 @@ import type {
   CallOverrides,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -34,7 +33,7 @@ export interface MAERC20Interface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
-    "mint()": FunctionFragment;
+    "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -68,7 +67,10 @@ export interface MAERC20Interface extends utils.Interface {
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
-  encodeFunctionData(functionFragment: "mint", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "mint",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -184,7 +186,9 @@ export interface MAERC20 extends BaseContract {
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     mint(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      to: string,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
@@ -229,7 +233,9 @@ export interface MAERC20 extends BaseContract {
   decimals(overrides?: CallOverrides): Promise<number>;
 
   mint(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+    to: string,
+    value: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
@@ -270,7 +276,11 @@ export interface MAERC20 extends BaseContract {
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
-    mint(overrides?: CallOverrides): Promise<void>;
+    mint(
+      to: string,
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -339,7 +349,9 @@ export interface MAERC20 extends BaseContract {
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      to: string,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -388,7 +400,9 @@ export interface MAERC20 extends BaseContract {
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mint(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      to: string,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;

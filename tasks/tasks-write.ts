@@ -1,3 +1,4 @@
+import { Signer } from "ethers";
 import { task } from "hardhat/config";
 import { MAERC20 } from "../typechain-types";
 
@@ -7,27 +8,14 @@ task("transfer", "Transfers the amount of tokens to the specified address")
 .addOptionalParam("from", "Senders's address")
 .addOptionalParam("to", "Recipient's address")
 .setAction(async (args, hre) => {
-    let from: string;
-    let toAddr: string;
-
     const accounts = await hre.ethers.getSigners();
-    if (!args.from) {
-        console.log("default account #1 is used as sender");
-        from = await accounts[0].getAddress();
-    } else {
-        from = args.from;
-    }
-    if (!args.to) {
-        console.log("default account #2 is used as recipient");
-        toAddr = await accounts[1].getAddress();
-    } else {
-        toAddr = args.to;
-    }
+    let from = args.from ?? accounts[0].address;
+    let to = args.to ?? accounts[1].address;
     const contract: MAERC20 = await hre.run(
         "init-contract", 
         {address: args.contract, signer:from}
     );
-    await contract.transfer(toAddr, args.value, {});
+    await contract.transfer(to, args.value, {});
 });
 
 task("transfer-from", "The spender transfers from the approved from-address to the to-address")
@@ -37,29 +25,10 @@ task("transfer-from", "The spender transfers from the approved from-address to t
     .addOptionalParam("to", "Address of recipient")
     .addOptionalParam("spender", "Address of spender")
     .setAction(async (args, hre) => {
-        let from: string;
-        let to: string;
-        let spender: string;
-
         const accounts = await hre.ethers.getSigners();
-        if (!args.from) {
-            console.log("default account #1 is used");
-            from = await accounts[0].getAddress();
-        } else {
-            from = args.from;
-        }
-        if (!args.to) {
-            console.log("default account #2 is used");
-            to = await accounts[1].getAddress();
-        } else {
-            to = args.to;
-        }
-        if (!args.spender) {
-            console.log("default account #2 is used");
-            spender = await accounts[1].getAddress();
-        } else {
-            spender = args.spender;
-        }
+        let from = args.from ?? accounts[0].address;
+        let to = args.to ?? accounts[1].address;
+        let spender = args.spender ?? accounts[1].address;
         const contract: MAERC20 = await hre.run(
             "init-contract",
             { address: args.contract, signer: spender }
@@ -73,22 +42,9 @@ task("approve", "Sets the amount which the spender can transfer from someone bal
     .addOptionalParam("from", "Address of owner")
     .addOptionalParam("spender", "Address of spender")
     .setAction(async (args, hre) => {
-        let owner: string;
-        let spender: string;
-
         const accounts = await hre.ethers.getSigners();
-        if (!args.from) {
-            console.log("default account #1 is used");
-            owner = await accounts[0].getAddress();
-        } else {
-            owner = args.from;
-        }
-        if (!args.spender) {
-            console.log("default account #2 is used");
-            spender = await accounts[1].getAddress();
-        } else {
-            spender = args.spender;
-        }
+        let owner = args.from ?? accounts[0].address;
+        let spender = args.spender ?? accounts[1].address;
         const contract: MAERC20 = await hre.run(
             "init-contract",
             { address: args.contract, signer: owner }
@@ -100,21 +56,16 @@ task("mint", "Changes ether to tokens")
     .addParam("contract", "Address of the contract")
     .addParam("value", "Amount of ether to change on tokens")
     .addOptionalParam("from", "Senders's address")
+    .addOptionalParam("to", "Address of recipient")
     .setAction(async (args, hre) => {
-        let from: string;
-
         const accounts = await hre.ethers.getSigners();
-        if (!args.from) {
-            console.log("default account #1 is used as sender");
-            from = await accounts[0].getAddress();
-        } else {
-            from = args.from;
-        }
+        let from = args.from ?? accounts[0].address;
+        let to = args.to ?? accounts[1].address;
         const contract: MAERC20 = await hre.run(
             "init-contract",
             { address: args.contract, signer: from }
         );
-        await contract.mint({value:args.value});
+        await contract.mint(to, args.value);
     });
 
 task("burn", "Burns tokens and refunds ether")
@@ -122,15 +73,8 @@ task("burn", "Burns tokens and refunds ether")
     .addParam("value", "Amount of tokens to burn")
     .addOptionalParam("from", "Senders's address")
     .setAction(async (args, hre) => {
-        let from: string;
-
         const accounts = await hre.ethers.getSigners();
-        if (!args.from) {
-            console.log("default account #1 is used as sender");
-            from = await accounts[0].getAddress();
-        } else {
-            from = args.from;
-        }
+        let from = args.from ?? accounts[0].address;
         const contract: MAERC20 = await hre.run(
             "init-contract",
             { address: args.contract, signer: from }
