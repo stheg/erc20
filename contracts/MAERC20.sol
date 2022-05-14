@@ -7,9 +7,11 @@ contract MAERC20 {
 
     string public name;
     string public symbol;
-    uint8 public decimals = 2;
+    uint8 constant public decimals = 2;
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
+    //from => spender => value
+    mapping(address => mapping(address => uint256)) private _allowances;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(
@@ -17,9 +19,6 @@ contract MAERC20 {
         address indexed spender, 
         uint256 value
     );
-
-    //from => spender => value
-    mapping(address => mapping(address => uint256)) private _allowances;
 
     constructor(string memory tokenName, string memory tokenSymbol) {
         name = tokenName;
@@ -34,7 +33,7 @@ contract MAERC20 {
 
     /// @notice Checks if the specified address isn't the Zero-Address
     modifier verifyAddress(address addr) {
-        require(addr != address(0), "The zero-address is not allowed");
+        require(addr != address(0), "The zero-address is not allowed.");
         _;
     }
 
