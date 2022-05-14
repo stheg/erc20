@@ -6,7 +6,7 @@ async function main() {
         "MAERC20",
         owner
     );
-    const contract = await contractFactory.deploy('Mad A. Token', 'MA');
+    const contract = await contractFactory.deploy('MADT', 'MADT');
     await contract.deployed();
     console.log("Contract deployed to:", contract.address);
 
