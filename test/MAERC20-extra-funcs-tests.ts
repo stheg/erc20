@@ -24,6 +24,11 @@ describe("MAERC20 extra functions", function () {
         await expect(t).to.be.revertedWith("Only the owner can do this.");
     });
 
+    it("mint should revert if zero address is used", async function () {
+        const t = contract.mint(ethers.constants.AddressZero, 10);
+        await expect(t).to.be.revertedWith("The zero-address is not allowed.");
+    });
+
     it("mint should increase balance and total supply", async function () {
         const amount = 10;
         const balanceBefore = await contract.balanceOf(owner.address);

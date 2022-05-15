@@ -39,7 +39,7 @@ contract MAERC20 {
     }
 
     /// @notice Checks if the specified address isn't the Zero-Address
-    modifier verifyAddress(address addr) {
+    modifier notZeroAddress(address addr) {
         require(addr != address(0), "The zero-address is not allowed.");
         _;
     }
@@ -76,7 +76,7 @@ contract MAERC20 {
     /// @return success result of the operation 
     function transferFrom(address from, address to, uint256 value) 
         public 
-        returns (bool success) 
+        returns (bool success)
     {
         if (msg.sender != from) {
             require(
@@ -98,7 +98,7 @@ contract MAERC20 {
     /// @return success result of the operation 
     function approve(address spender, uint256 value) 
         public
-        verifyAddress(spender) 
+        notZeroAddress(spender) 
         returns (bool success) 
     {
         _allowances[msg.sender][spender] = value;
@@ -107,8 +107,12 @@ contract MAERC20 {
     }
 
     /// @notice Adds the requested amount of tokens to the requested balance,
-    /// increases the total supply and emits an `Transfer` event
-    function mint(address to, uint value) public onlyOwner() {
+    /// increases the total supply and emits the `Transfer` event
+    function mint(address to, uint value) 
+        public 
+        onlyOwner()
+        notZeroAddress(to) 
+    {
         balanceOf[to] += value;
         totalSupply += value;
         emit Transfer(address(0), to, value);
@@ -132,8 +136,8 @@ contract MAERC20 {
     /// otherwise it throws an error 
     function _transferOrThrow(address from, address to, uint256 value)
         private
-        verifyAddress(from)
-        verifyAddress(to)
+        notZeroAddress(from)
+        notZeroAddress(to)
         checkBalance(from, value)
     {
         balanceOf[from] -= value;
